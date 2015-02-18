@@ -3,14 +3,17 @@ setwd("/home/kohei/Documents/R")
 
 #devtools::install_github("kbenoit/quanteda", ref="dev")
 #devtools::install_github("kbenoit/quantedaData")
-require(quanteda)
-require(quantedaData)
+#require(quanteda)
+#require(quantedaData)
+
+# Compile
 #install.packages('Rcpp')
 require(Rcpp)
-Sys.setenv("PKG_LIBS"="-lpcrecpp")
-Rcpp::sourceCpp('tokenize.cpp')
+Sys.setenv("PKG_LIBS"="-lpcrecpp") # This is importanat
+Rcpp::sourceCpp('src/tokenize.cpp')
 
-# Wrapper -----------------------------------
+#' @rdname tokenize_c
+#' @param compatible with its R version
 tokenize_c <- function(x, sep=' ', simplify=FALSE,
                       minLength=1, toLower=TRUE, removeDigits=TRUE, removePunct=TRUE,
                       removeTwitter=TRUE, removeURL=TRUE, removeAdditional=NULL){
