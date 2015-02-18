@@ -6,6 +6,11 @@ using namespace Rcpp;
 using namespace std;
 using namespace pcrecpp;
 
+pcrecpp::RE re_digits("[[:digit:]]");
+pcrecpp::RE re_punct("[[:punct:]]");
+pcrecpp::RE re_twitter("(^|\\s)(#|@)\\S+");
+pcrecpp::RE re_url("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:\\'\".,<>?]))");
+
 // [[Rcpp::export]]
 Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep, 
                        SEXP minLength,
@@ -29,32 +34,18 @@ Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep,
   std::string rm_addit = Rcpp::as <string> (removeAdditional);
   
   // Regexp cleaning
-  if(rm_digts){
-    pcrecpp::RE re_digits("[[:digit:]]");
-    re_digits.GlobalReplace("", &str);
-  }
-  if(rm_punct){
-    pcrecpp::RE re_punct("[[:punct:]]");
-    re_punct.GlobalReplace("", &str);
-  }
-  if(rm_twitter){
-    pcrecpp::RE re_twitter("(^|\\s)(#|@)\\S+");
-    re_twitter.GlobalReplace(" ", &str);
-  }
-  if(rm_url){
-    pcrecpp::RE re_url("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:\\'\".,<>?]))");
-    re_url.GlobalReplace("", &str);
-  }
-  
+  if(rm_digts) re_digits.GlobalReplace("", &str);
+  if(rm_punct) re_punct.GlobalReplace("", &str);
+  if(rm_twitter) re_twitter.GlobalReplace(" ", &str);
+  if(rm_url) re_url.GlobalReplace("", &str);
   if(rm_addit.length() > 0){
     try{
-      pcrecpp::RE re(rm_addit);
-      re.GlobalReplace("", &str);
+      pcrecpp::RE re_addit(rm_addit);
+      re_addit.GlobalReplace("", &str);
     }catch(std::exception& e){
       Rcout << "Invalid regular expression given: " <<  rm_addit << "\n";
     }
   }
-  
   
   int len_str = str.length();
   int i_pos = 0;

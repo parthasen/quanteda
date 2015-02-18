@@ -27,7 +27,6 @@ tokenize_c <- function(x, sep=' ', simplify=FALSE,
                          removeTwitter, removeURL, removeAdditional)))
     
     }
-  
 }
 
 # Dev -----------------------------------------
@@ -84,4 +83,11 @@ microbenchmark(strsplit(text_bech, ' ', fixed=TRUE),
                tokenize(text_bech, simplify=TRUE, removeDigits=TRUE, removePunct=TRUE,
                         toLower=TRUE, removeAdditional='[_]', 
                         removeTwitter=TRUE, removeURL=TRUE), times=1000)
+# 
+# microbenchmark(strsplit(text_bech, ' ', fixed=TRUE),
+#                tokenizecpp(text_bech, ' ', minLength=1, TRUE, TRUE, TRUE, TRUE, TRUE, removeAdditional=''),
+#                tokenizecpp2(text_bech, ' ', minLength=1, TRUE, TRUE, TRUE, TRUE, TRUE, removeAdditional=''),
+#                times=1000)
+
+
 
