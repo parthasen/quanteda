@@ -18,23 +18,13 @@ Rcpp::sourceCpp('src/tokenize.cpp')
 #' @param compatible with its R version
 tokenize_c <- function(x, sep=' ', simplify=FALSE,
                       minLength=1, toLower=TRUE, removeDigits=TRUE, removePunct=TRUE,
-                      removeTwitter=TRUE, removeURL=TRUE, removeAdditional=NULL){
-    remove <- c()
-    if(removeDigits){
-      remove <- c(remove,'[[:digit:]]')
-    }
-    if(removePunct){
-      remove <- c(remove,'[[:punct:]]')
-    }
-    if(!is.null(removeAdditional)){
-      remove <- c(remove, removeAdditional)
-    }
+                      removeTwitter=TRUE, removeURL=TRUE, removeAdditional=''){
     if(simplify){
-      return(tokenizecpp(x, sep, paste0(remove, collapse='|'), 
-                         minLength, toLower, removeTwitter, removeURL))
+      return(tokenizecpp(x, sep, minLength, toLower, removeDigits, removePunct, 
+                         removeTwitter, removeURL, removeAdditional))
     }else{
-      return(list(tokenizecpp(x, sep, paste0(remove, collapse='|'), 
-                         minLength, toLower, removeTwitter, removeURL)))
+      return(list(tokenizecpp(x, sep, minLength, toLower, removeDigits, removePunct, 
+                         removeTwitter, removeURL, removeAdditional)))
     
     }
   
@@ -82,8 +72,12 @@ text_bech <- text8
 #text_bech <- paste(inaugTexts, collapse=' ')
 text_bech <- inaugTexts[2]
 microbenchmark(strsplit(text_bech, ' ', fixed=TRUE),
-               tokenizecpp(text_bech, ' ', remove="[^a-zA-Z ]", minLength=1, 
-                           toLower=TRUE, removeTwitter=TRUE, removeURL=TRUE),
+               tokenizecpp(text_bech, ' ', minLength=1, removeDigits=FALSE, removePunct=FALSE,
+                           toLower=TRUE, removeAdditional='[^a-zA-Z ]', 
+                           removeTwitter=TRUE, removeURL=TRUE),
+               tokenizecpp(text_bech, ' ', minLength=1, removeDigits=TRUE, removePunct=TRUE,
+                           toLower=TRUE, removeAdditional='[_]', 
+                           removeTwitter=TRUE, removeURL=TRUE),
                tokenize_c(text_bech, simplify=TRUE, removeDigits=TRUE, removePunct=TRUE,
                           toLower=TRUE, removeAdditional='[_]', 
                           removeTwitter=TRUE, removeURL=TRUE), 

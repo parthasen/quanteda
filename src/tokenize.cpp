@@ -7,24 +7,36 @@ using namespace std;
 using namespace pcrecpp;
 
 // [[Rcpp::export]]
-Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep, SEXP remove,
+Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep, 
                        SEXP minLength,
                        SEXP toLower, 
+                       SEXP removeDigits,
+                       SEXP removePunct,
                        SEXP removeTwitter,
-                       SEXP removeURL){
+                       SEXP removeURL,
+                       SEXP removeAdditional){
   
   std::string str = Rcpp::as <string> (x); 
   std::string delim = Rcpp::as <string> (sep);
-  std::string pat_rm = Rcpp::as <string> (remove); 
   const char *delim_char = delim.c_str();
-  
-  // Options for the future
   int len_min = Rcpp::as <int> (minLength);
   bool to_lower = Rcpp::as <bool> (toLower);
+  bool rm_digts = Rcpp::as <bool> (removeDigits);
+  bool rm_punct = Rcpp::as <bool> (removePunct);
   bool rm_twitter = Rcpp::as <bool> (removeTwitter);
   bool rm_url = Rcpp::as <bool> (removeURL);
   
+  std::string rm_addit = Rcpp::as <string> (removeAdditional);
+  
   // Regexp cleaning
+  if(rm_digts){
+    pcrecpp::RE re_digits("[[:digit:]]");
+    re_digits.GlobalReplace("", &str);
+  }
+  if(rm_punct){
+    pcrecpp::RE re_punct("[[:punct:]]");
+    re_punct.GlobalReplace("", &str);
+  }
   if(rm_twitter){
     pcrecpp::RE re_twitter("(^|\\s)(#|@)\\S+");
     re_twitter.GlobalReplace(" ", &str);
@@ -34,11 +46,13 @@ Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep, SEXP remove,
     re_url.GlobalReplace("", &str);
   }
   
-  try{
-    pcrecpp::RE re(pat_rm);
-    re.GlobalReplace("", &str);
-  }catch(std::exception& e){
-    Rcout << "Invalid regular expression given: " <<  pat_rm << "\n";
+  if(rm_addit.length() > 0){
+    try{
+      pcrecpp::RE re(rm_addit);
+      re.GlobalReplace("", &str);
+    }catch(std::exception& e){
+      Rcout << "Invalid regular expression given: " <<  rm_addit << "\n";
+    }
   }
   
   
