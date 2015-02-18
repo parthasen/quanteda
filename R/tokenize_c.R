@@ -13,6 +13,8 @@ Sys.setenv("PKG_LIBS"="-lpcrecpp") # This is importanat
 Rcpp::sourceCpp('src/tokenize.cpp')
 
 #' @rdname tokenize_c
+#' @importFrom Rcpp evalCpp
+#' @useDynLib quanteda
 #' @param compatible with its R version
 tokenize_c <- function(x, sep=' ', simplify=FALSE,
                       minLength=1, toLower=TRUE, removeDigits=TRUE, removePunct=TRUE,
