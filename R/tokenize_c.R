@@ -80,7 +80,7 @@ library(microbenchmark)
 
 text_bech <- text8
 #text_bech <- paste(inaugTexts, collapse=' ')
-#text_bech <- inaugTexts[2]
+text_bech <- inaugTexts[2]
 microbenchmark(strsplit(text_bech, ' ', fixed=TRUE),
                tokenizecpp(text_bech, ' ', remove="[^a-zA-Z ]", minLength=1, 
                            toLower=TRUE, removeTwitter=TRUE, removeURL=TRUE),
