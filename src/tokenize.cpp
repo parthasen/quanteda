@@ -4,6 +4,7 @@
 
 using namespace Rcpp;
 using namespace std;
+using namespace pcrecpp;
 
 // [[Rcpp::export]]
 Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep, SEXP remove,
