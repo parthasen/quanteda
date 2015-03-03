@@ -22,6 +22,8 @@ tokenize <- function(x, ...) {
 }
 
 #' @rdname tokenize
+#' @importFrom Rcpp evalCpp
+#' @useDynLib quanteda
 #' @param simplify If \code{TRUE}, return a character vector of tokens rather 
 #'   than a list of length \code{\link{ndoc}(texts)}, with each element of the 
 #'   list containing a character vector of the tokens corresponding to that 
