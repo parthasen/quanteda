@@ -9,6 +9,18 @@ library(profr)
 ###############
 # definitions of functions to test
 ###############
+
+
+# Using Kohei's tokenizer
+tokCpp <- function(texts, sep=" ", clean=TRUE, ...){
+    # apply to each texts, return a list
+    result <- lapply(texts, quanteda::tokenize_c)
+    # remove empty "tokens" caused by multiple whitespace characters in sequence
+    result <- lapply(result, function(x) x[which(x != "")])
+    return(result)
+}
+
+
 tokenizeSingleCleanAfter <- function(s, sep=" ", clean=TRUE, ...) {
     # s <- unlist(s)
     tokens <- scan(what="char", text=s, quiet=TRUE, quote="", sep=sep)
@@ -121,8 +133,8 @@ d1 <- tokenizeCharvecCleanAfter(inaugTexts)
 d2 <- tokenizeCharvecCleanFirst(inaugTexts)
 identical(d1,d2)
 
-funcList <- c(tokenizeCharvecCleanAfter, tokenizeCharvecCleanFirst, quanteda::tokenize, quanteda::dfm, tokenizeNoClean1,  tmtest)
-funcNames <- c('cleanAfter', 'cleanFirst', 'originalTokenize', 'defaultDfm', 'tokenizeNoClean1',  'tmDfm')
+funcList <- c(tokenizeCharvecCleanAfter, tokenizeCharvecCleanFirst, quanteda::tokenize, quanteda::dfm, tokenizeNoClean1,  tmtest, tokCpp)
+funcNames <- c('cleanAfter', 'cleanFirst', 'originalTokenize', 'defaultDfm', 'tokenizeNoClean1',  'tmDfm', 'tokCpp')
 
 timings <- compareFunctions(inaugTexts,funcList , splits=5, fnames=funcNames) %>%
 melt(id=c('numDocs'), value.name='elapsed') 
@@ -130,8 +142,6 @@ melt(id=c('numDocs'), value.name='elapsed')
 ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 
     geom_line() +
     geom_point(size=3)
-
-
 
 
 
@@ -151,11 +161,11 @@ txts <- txts[order(nchar(txts))]
 
 
 
-funcList <- c(tokenizeCharvecCleanAfter, tokenizeCharvecCleanFirst, quanteda::tokenize, quanteda::dfm, tokenizeNoClean1,  tmtest)
-funcNames <- c('cleanAfter', 'cleanFirst', 'originalTokenize', 'defaultDfm', 'tokenizeNoClean1',  'tmDfm')
+funcList <- c(tokenizeCharvecCleanAfter, tokenizeCharvecCleanFirst, quanteda::tokenize, quanteda::dfm, tokenizeNoClean1,  tmtest, tokCpp)
+funcNames <- c('cleanAfter', 'cleanFirst', 'originalTokenize', 'defaultDfm', 'tokenizeNoClean1',  'tmDfm', 'tokCpp')
 
 # The 1000 shortest texts
-timings <- compareFunctions2(txts[1:1000],funcList , splits=5, fnames=funcNames) %>%
+timings <- compareFunctions(txts[1:1000],funcList , splits=5, fnames=funcNames) %>%
     melt(id=c('numDocs'), value.name='elapsed') 
 
 ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 

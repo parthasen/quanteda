@@ -35,7 +35,9 @@ Imports:
     wordcloud,
     proxy,
     slam,
+    Rcpp,
     tm
+LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     knitr,
     lda,
@@ -73,3 +75,4 @@ Collate:
     'textmodel-generics.R'
     'textmodel-wordscores.R'
     'tokenize.R'
+    'tokenize_c.R'
