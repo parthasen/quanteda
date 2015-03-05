@@ -92,7 +92,7 @@ tmtest <- function(texts){
 ###############
 # function for comparing performance of a list of functions on increasing numbers of texts
 ###############
-compareFunctions <- function(texts, funs,  splits=5, plot=TRUE, fnames=NULL) {
+compareFunctions <- function(texts, funs,  splits=5, plot=TRUE, fnames=NULL, ...) {
     funTimes <- as.data.frame(matrix())
     print(fnames)
     ind <- 1
@@ -147,6 +147,28 @@ ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) +
 
 
 ###############
+# ie budgets
+###############
+
+data(iebudgetsCorpus)
+curTexts <- texts(iebudgetsCorpus)
+d1 <- tokenizeCharvecCleanAfter(curTexts)
+d2 <- tokenizeCharvecCleanFirst(curTexts)
+identical(d1,d2)
+
+funcList <- c(tokenizeCharvecCleanAfter, tokenizeCharvecCleanFirst, quanteda::tokenize, quanteda::dfm, tokenizeNoClean1,  tmtest, tokCpp)
+funcNames <- c('cleanAfter', 'cleanFirst', 'originalTokenize', 'defaultDfm', 'tokenizeNoClean1',  'tmDfm', 'tokCpp')
+
+
+timings <- compareFunctions(curTexts,funcList , splits=5, fnames=funcNames) %>%
+    melt(id=c('numDocs'), value.name='elapsed') 
+
+ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 
+    geom_line() +
+    geom_point(size=3)
+
+
+###############
 ###############
 
 #Lauderdale and Clark
@@ -164,15 +186,6 @@ txts <- txts[order(nchar(txts))]
 funcList <- c(tokenizeCharvecCleanAfter, tokenizeCharvecCleanFirst, quanteda::tokenize, quanteda::dfm, tokenizeNoClean1,  tmtest, tokCpp)
 funcNames <- c('cleanAfter', 'cleanFirst', 'originalTokenize', 'defaultDfm', 'tokenizeNoClean1',  'tmDfm', 'tokCpp')
 
-# The 1000 shortest texts
-timings <- compareFunctions(txts[1:1000],funcList , splits=5, fnames=funcNames) %>%
-    melt(id=c('numDocs'), value.name='elapsed') 
-
-ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 
-    geom_line() +
-    geom_point(size=3)
-
-
 #The 5 longest texts
 longTxts <- txts[(length(txts)-5):length(txts)]
 sum(nchar(longTxts))
@@ -183,6 +196,7 @@ ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) +
     geom_line() +
     geom_point(size=3)
 
+
 #The 8000 shortest texts
 shortTexts <- txts[1:8000]
 sum(nchar(shortTexts))
@@ -192,6 +206,42 @@ timings <- compareFunctions(txts[1:8000],funcList , splits=5, fnames=funcNames) 
 ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 
     geom_line() +
     geom_point(size=3)
+
+#5000 random texts
+randTexts <- sample(txts, 5000)
+sum(nchar(randTexts))
+timings <- compareFunctions(randTexts,funcList , splits=5, fnames=funcNames) %>%
+    melt(id=c('numDocs'), value.name='elapsed') 
+
+ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 
+    geom_line() +
+    geom_point(size=3)
+
+
+
+
+##=======================================##
+# testing various dfm options
+##=======================================##
+
+
+dfmCleanFirst <- function(charvec){dfm(charvec, clean="first")}
+dfmCleanAfter <- function(charvec){dfm(charvec, clean="after")}
+dfmCpp <- function(charvec){dfm(charvec, clean="cpp")}
+
+funcList <- c(dfmCleanFirst, dfmCleanAfter, dfmCpp)
+funcNames <- c('dfmCleanFirst', 'dfmCleanAfter', 'dfmCpp')
+
+#5000 random texts with dfm options
+randTexts <- inaugTexts
+sum(nchar(randTexts))
+timings <- compareFunctions(randTexts,funcList , splits=5, fnames=funcNames) %>%
+    melt(id=c('numDocs'), value.name='elapsed') 
+
+ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 
+    geom_line() +
+    geom_point(size=3)
+
 
 
 

@@ -163,7 +163,7 @@ dfm <- function(x, ...) {
 #' names(topf) <- colnames(dfmsBig)
 #' head(sort(topf, decreasing=TRUE), 100)
 #' }
-dfm.character <- function(x, verbose=TRUE, clean=TRUE, stem=FALSE, 
+dfm.character <- function(x, verbose=TRUE, clean=c("first", "after", "cpp"), stem=FALSE, 
                           ignoredFeatures = NULL, keptFeatures=NULL,
                           matrixType=c("sparse", "dense"), 
                           language="english",
@@ -172,6 +172,7 @@ dfm.character <- function(x, verbose=TRUE, clean=TRUE, stem=FALSE,
                           addto=NULL, 
                           ...) {
     startTime <- proc.time()
+    clean <- match.arg(clean)
     matrixType <- match.arg(matrixType)
     if (!fromCorpus & verbose) 
         cat("Creating a dfm from a character vector ...")
@@ -183,10 +184,26 @@ dfm.character <- function(x, verbose=TRUE, clean=TRUE, stem=FALSE,
     if (is.null(names(x))) 
         names(docIndex) <- factor(paste("text", 1:length(x), sep="")) else
             names(docIndex) <- names(x)
-    #?clean
+    
+    if (clean=="first") {
+        if (verbose) cat("\n   ... cleaning the texts")
+        x <- clean(x, ...)
+        #if (verbose) cat(", ", nrow(alltokens[features == ""]), " removed entirely", sep="")
+        # remove any features eliminated entirely by cleaning
+       # alltokens <- alltokens[features != ""]  ## KB 12 Feb to fix failure on dfm(inaugTexts[1])
+    }
+
+    
     if (verbose) cat("\n   ... tokenizing texts")
+    
+    
     if (!bigrams) {
-        tokenizedTexts <- lapply(x, tokenizeSingle, sep=" ")
+        if(clean=="cpp"){
+            tokenizedTexts <- lapply(x, tokenize_c, sep=" ")
+        }else{
+            tokenizedTexts <- lapply(x, tokenizeSingle, sep=" ")
+        }
+        
     } else {
         tokenizedTexts <- bigrams(x, include.unigrams=TRUE)
         if (verbose) cat (" (and forming bigrams)")
@@ -200,7 +217,7 @@ dfm.character <- function(x, verbose=TRUE, clean=TRUE, stem=FALSE,
     if (verbose & bigrams) 
         cat(" incl.", format(sum(grepl("_", alltokens$features)), big.mark=","), "bigrams")
     
-    if (clean) {
+    if (clean=="after") {
         if (verbose) cat("\n   ... cleaning the tokens")
         alltokens$features <- clean(alltokens$features, ...)
         if (verbose) cat(", ", nrow(alltokens[features == ""]), " removed entirely", sep="")

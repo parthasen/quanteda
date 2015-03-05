@@ -9,11 +9,11 @@
 \usage{
 dfm(x, ...)
 
-\method{dfm}{character}(x, verbose = TRUE, clean = TRUE, stem = FALSE,
-  ignoredFeatures = NULL, keptFeatures = NULL, matrixType = c("sparse",
-  "dense"), language = "english", fromCorpus = FALSE, bigrams = FALSE,
-  thesaurus = NULL, dictionary = NULL, dictionary_regex = FALSE,
-  addto = NULL, ...)
+\method{dfm}{character}(x, verbose = TRUE, clean = c("first", "after",
+  "cpp"), stem = FALSE, ignoredFeatures = NULL, keptFeatures = NULL,
+  matrixType = c("sparse", "dense"), language = "english",
+  fromCorpus = FALSE, bigrams = FALSE, thesaurus = NULL,
+  dictionary = NULL, dictionary_regex = FALSE, addto = NULL, ...)
 
 \method{dfm}{corpus}(x, verbose = TRUE, clean = TRUE, stem = FALSE,
   ignoredFeatures = NULL, keptFeatures = NULL, matrixType = c("sparse",
