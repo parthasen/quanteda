@@ -229,11 +229,24 @@ dfmCleanFirst <- function(charvec){dfm(charvec, clean="first")}
 dfmCleanAfter <- function(charvec){dfm(charvec, clean="after")}
 dfmCpp <- function(charvec){dfm(charvec, clean="cpp")}
 
-funcList <- c(dfmCleanFirst, dfmCleanAfter, dfmCpp)
-funcNames <- c('dfmCleanFirst', 'dfmCleanAfter', 'dfmCpp')
+funcList <- c(dfmCleanFirst, dfmCleanAfter, dfmCpp, tmtest)
+funcNames <- c('dfmCleanFirst', 'dfmCleanAfter', 'dfmCpp', "tmtest")
 
-#5000 random texts with dfm options
-randTexts <- inaugTexts
+data(iebudgetsCorpus)
+ieTexts <- texts(iebudgetsCorpus)
+sum(nchar(ieTexts))
+timings <- compareFunctions(ieTexts,funcList , splits=5, fnames=funcNames) %>%
+    melt(id=c('numDocs'), value.name='elapsed') 
+
+ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 
+    geom_line() +
+    geom_point(size=3)
+
+
+
+
+#5000 random texts
+randTexts <- sample(txts, 5000)
 sum(nchar(randTexts))
 timings <- compareFunctions(randTexts,funcList , splits=5, fnames=funcNames) %>%
     melt(id=c('numDocs'), value.name='elapsed') 
@@ -241,7 +254,6 @@ timings <- compareFunctions(randTexts,funcList , splits=5, fnames=funcNames) %>%
 ggplot(timings, aes(x=numDocs, y=elapsed, colour=variable)) + 
     geom_line() +
     geom_point(size=3)
-
 
 
 
