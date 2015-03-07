@@ -33,15 +33,9 @@ Imports:
     data.table (>= 1.9.3),
     SnowballC,
     wordcloud,
-<<<<<<< HEAD
     proxy,
-    slam,
     Rcpp,
-    tm
 LinkingTo: Rcpp, RcppArmadillo
-=======
-    proxy
->>>>>>> dev
 Suggests:
     knitr,
     lda,
@@ -55,6 +49,7 @@ BugReports: https://github.com/kbenoit/quanteda/issues
 LazyData: TRUE
 VignetteBuilder: knitr
 Collate:
+    'RcppExports.R'
     'clean.R'
     'collocations.R'
     'converters.R'
