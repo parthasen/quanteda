@@ -35,7 +35,7 @@ Imports:
     wordcloud,
     proxy,
     Rcpp
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo, BH
 Suggests:
     knitr,
     lda,

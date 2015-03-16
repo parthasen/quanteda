@@ -4,17 +4,17 @@
 
 #include <Rcpp.h>
 #include <string.h>
-#include <pcrecpp.h>
+#include <boost/regex.hpp>
 
 using namespace Rcpp;
 using namespace std;
-using namespace pcrecpp;
+using namespace boost;
 
-pcrecpp::RE re_digits2("[[:digit:]]");
-pcrecpp::RE re_punct2("[[:punct:]]");
-pcrecpp::RE re_twitter2("(^|\\s)(#|@)\\S+");
-pcrecpp::RE re_url2("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:\\'\".,<>?]))");
-pcrecpp::RE re_multipleSpaces("\\s{2,}");
+boost::regex re_digits2 ("[[:digit:]]");
+boost::regex re_punct2("[[:punct:]]");
+boost::regex re_twitter2("(^|\\s)(#|@)\\S+");
+boost::regex re_url2("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:\\'\".,<>?]))");
+boost::regex re_multipleSpaces("\\s{2,}");
 
 // [[Rcpp::export]]
 Rcpp::CharacterVector cleancpp(SEXP x, 
@@ -33,20 +33,21 @@ Rcpp::CharacterVector cleancpp(SEXP x,
     bool rm_url = Rcpp::as <bool> (removeURL);
   
     std::string rm_addit = Rcpp::as <string> (removeAdditional);
-  
+    // const std::string blank ("");
+    
     // Regexp cleaning
     if (rm_digts) 
-        re_digits2.GlobalReplace("", &str);
+        boost::regex_replace (&str, re_digits2, "");
     if (rm_punct) 
-        re_punct2.GlobalReplace("", &str);
+        boost::regex_replace (&str, re_punct2, "");
     if (rm_twitter) 
-        re_twitter2.GlobalReplace(" ", &str);
+        boost::regex_replace (&str, re_twitter2, " ");
     if (rm_url) 
-        re_url2.GlobalReplace("", &str);
+        boost::regex_replace (&str, re_url2, "");
     if (rm_addit.length() > 0) {
         try {
-            pcrecpp::RE re_addit2(rm_addit);
-            re_addit2.GlobalReplace("", &str);
+            const std::regex re_addit2(rm_addit);
+            boost::regex_replace (&str, re_addit2, "");
         } catch(std::exception& e) {
             Rcout << "Invalid regular expression given: " <<  rm_addit << "\n";
         }
@@ -61,7 +62,7 @@ Rcpp::CharacterVector cleancpp(SEXP x,
     }
 
     // change 2+ spaces to a single space
-    re_multipleSpaces.GlobalReplace(" ", &str);
+    boost::regex_replace (&str, re_multipleSpaces, " ");
 
     return wrap(str);
 }

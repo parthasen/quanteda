@@ -1,10 +1,3 @@
-###
-### NOTE: Need to set 
-###       Sys.setenv("PKG_LIBS"="-lpcrecpp")
-###       for the build to work
-###
-
-Sys.setenv("PKG_LIBS"="-lpcrecpp")
 
 #' tokenize a set of texts
 #'
