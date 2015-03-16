@@ -3,6 +3,12 @@
 // based regexes) rather than calling separate ones.
 
 #include <Rcpp.h>
+
+int cleanC(int x) {
+   return x * 2;
+}
+
+/*
 #include <string.h>
 #include <boost/regex.hpp>
 
@@ -37,17 +43,17 @@ Rcpp::CharacterVector cleancpp(SEXP x,
     
     // Regexp cleaning
     if (rm_digts) 
-        boost::regex_replace (&str, re_digits2, "");
+        str = boost::regex_replace (str, re_digits2, "");
     if (rm_punct) 
-        boost::regex_replace (&str, re_punct2, "");
+        str = boost::regex_replace (str, re_punct2, "");
     if (rm_twitter) 
-        boost::regex_replace (&str, re_twitter2, " ");
+        str = boost::regex_replace (str, re_twitter2, " ");
     if (rm_url) 
-        boost::regex_replace (&str, re_url2, "");
+        str = boost::regex_replace (str, re_url2, "");
     if (rm_addit.length() > 0) {
         try {
-            const std::regex re_addit2(rm_addit);
-            boost::regex_replace (&str, re_addit2, "");
+            const boost::regex re_addit2(rm_addit);
+            str = boost::regex_replace (str, re_addit2, "");
         } catch(std::exception& e) {
             Rcout << "Invalid regular expression given: " <<  rm_addit << "\n";
         }
@@ -62,7 +68,9 @@ Rcpp::CharacterVector cleancpp(SEXP x,
     }
 
     // change 2+ spaces to a single space
-    boost::regex_replace (&str, re_multipleSpaces, " ");
+    str = boost::regex_replace (str, re_multipleSpaces, " ");
 
     return wrap(str);
 }
+*/
+

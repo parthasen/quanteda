@@ -6,20 +6,14 @@
 
 using namespace Rcpp;
 
-// cleancpp
-Rcpp::CharacterVector cleancpp(SEXP x, SEXP toLower, SEXP removeDigits, SEXP removePunct, SEXP removeTwitter, SEXP removeURL, SEXP removeAdditional);
-RcppExport SEXP quanteda_cleancpp(SEXP xSEXP, SEXP toLowerSEXP, SEXP removeDigitsSEXP, SEXP removePunctSEXP, SEXP removeTwitterSEXP, SEXP removeURLSEXP, SEXP removeAdditionalSEXP) {
+// regexDemo
+Rcpp::DataFrame regexDemo(std::vector<std::string> s);
+RcppExport SEXP quanteda_regexDemo(SEXP sSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type toLower(toLowerSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type removeDigits(removeDigitsSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type removePunct(removePunctSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type removeTwitter(removeTwitterSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type removeURL(removeURLSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type removeAdditional(removeAdditionalSEXP);
-    __result = Rcpp::wrap(cleancpp(x, toLower, removeDigits, removePunct, removeTwitter, removeURL, removeAdditional));
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type s(sSEXP);
+    __result = Rcpp::wrap(regexDemo(s));
     return __result;
 END_RCPP
 }
