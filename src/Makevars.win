@@ -1,1 +1,1 @@
-PKG_LIBS = -lpcrecpp -lblas -llapack
+PKG_LIBS = -lpcrecpp -lblas -llapack -lboost_regex

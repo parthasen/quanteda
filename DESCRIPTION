@@ -34,7 +34,8 @@ Imports:
     SnowballC,
     wordcloud,
     proxy,
-    Rcpp (>= 0.11.0)
+    Rcpp (>= 0.11.0),
+    BH
 LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     knitr,
