@@ -13,7 +13,3 @@ justTokenizeCpp <- function(x, sep, minLength) {
     .Call('quanteda_justTokenizeCpp', PACKAGE = 'quanteda', x, sep, minLength)
 }
 
-wordfishcpp <- function(wfm, dir, priors, tol) {
-    .Call('quanteda_wordfishcpp', PACKAGE = 'quanteda', wfm, dir, priors, tol)
-}
-

@@ -35,7 +35,7 @@ Imports:
     wordcloud,
     proxy,
     Rcpp
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp
 Suggests:
     knitr,
     lda,
@@ -73,6 +73,5 @@ Collate:
     'stopwords.R'
     'syllables.R'
     'textmodel-generics.R'
-    'textmodel-wordfish.R'
     'textmodel-wordscores.R'
     'tokenize.R'
