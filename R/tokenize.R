@@ -1,5 +1,10 @@
+###
+### NOTE: Need to set 
+###       Sys.setenv("PKG_LIBS"="-lpcrecpp")
+###       for the build to work
+###
 
-# with scan
+Sys.setenv("PKG_LIBS"="-lpcrecpp")
 
 #' tokenize a set of texts
 #'
@@ -9,6 +14,7 @@
 #' @param x The text(s) or corpus to be tokenized
 #' @param ... additional arguments passed to \code{\link{clean}}
 #' @return A list of length \code{\link{ndoc}(x)} of the tokens found in each text.
+#' @author Kohei Watanabe (C++ code), Ken Benoit, and Paul Nulty
 #' @export
 #' @examples 
 #' # same for character vectors and for lists
@@ -22,13 +28,19 @@ tokenize <- function(x, ...) {
 }
 
 #' @rdname tokenize
+#' @param sep by default, tokenize expects a "white-space" delimiter between 
+#'   tokens. Alternatively, \code{sep} can be used to specify another character 
+#'   which delimits fields.
 #' @param simplify If \code{TRUE}, return a character vector of tokens rather 
 #'   than a list of length \code{\link{ndoc}(texts)}, with each element of the 
 #'   list containing a character vector of the tokens corresponding to that 
 #'   text.
-#' @param sep by default, tokenize expects a "white-space" delimiter between
-#'   tokens. Alternatively, \code{sep} can be used to specify another character
-#'   which delimits fields.
+#' @param cpp if \code{TRUE}, tokenize and clean using C++ tokenizer, otherwise 
+#'   use a slower R version
+#' @param minLength the minimum length in characters for retaining a token,
+#'   defaults to 1.  Only used if \code{cpp=TRUE}.
+#' @importFrom Rcpp evalCpp
+#' @useDynLib quanteda
 #' @export
 #' @examples 
 #' # returned as a list
@@ -37,31 +49,32 @@ tokenize <- function(x, ...) {
 #' head(tokenize(inaugTexts[57], simplify=TRUE), 10)
 #' 
 #' # demonstrate some options with clean
-#' head(tokenize(inaugTexts[57], simplify=TRUE, lower=FALSE), 30)
-tokenize.character <- function(x, simplify=FALSE, sep=" ", ... ) {
-    # function to tokenize a single element character
-    # profiling shows that using scan is 3x faster than using strsplit
-    tokenizeSingle <- function(s, sep=" ", ...) {
-        
-        # s <- unlist(s)
-        tokens <- scan(what="char", text=s, quiet=TRUE, quote="", sep=sep)
-        tokens <- clean(tokens, ...)
-        return(tokens)
+#' head(tokenize(inaugTexts[57], simplify=TRUE, cpp=TRUE), 30)
+#' ## NOTE: not the same as
+#' head(tokenize(inaugTexts[57], simplify=TRUE, cpp=FALSE), 30)
+#' 
+#' ## MORE COMPARISONS
+#' tokenize("this is MY <3 4U @@myhandle gr8 stuff :-)", removeTwitter=FALSE, cpp=TRUE)
+#' tokenize("this is MY <3 4U @@myhandle gr8 stuff :-)", removeTwitter=FALSE, cpp=FALSE)
+#' tokenize("great website http://textasdata.com", removeURL=FALSE, cpp=TRUE)
+#' tokenize("great website http://textasdata.com", removeURL=FALSE, cpp=FALSE)
+#' tokenize("great website http://textasdata.com", removeURL=TRUE, cpp=TRUE)
+#' tokenize("great website http://textasdata.com", removeURL=TRUE, cpp=FALSE)
+tokenize.character <- function(x, cpp=FALSE, simplify=FALSE, sep=" ", minLength=1, ... ) {
+
+    if (cpp) {
+        result <- lapply(x, tokenizeSingle, sep, minLength, ...) #toLower, removeDigits, removePunct, 
+                              #removeTwitter, removeURL, removeAdditional)
+    } else {
+        result <- lapply(x, tokenizeSingleOld, sep, ...)
+        # remove empty "tokens" caused by multiple whitespace characters in sequence
+        result <- lapply(result, function(x) x[which(x != "")])
     }
     
-    # apply to each texts, return a list
-    result <- lapply(x, tokenizeSingle, sep, ...)
-    
-    # remove empty "tokens" caused by multiple whitespace characters in sequence
-    result <- lapply(result, function(x) x[which(x != "")])
-    
-    #if (simplify | length(result)==1) {
-    # change to a character vector of tokens if simplify==TRUE 
-    # this will concatenate the token lists if length(result)>1
-    if (simplify) {
-        result <- unlist(result, use.names=FALSE)
-    }
-    return(result)
+    if (simplify) 
+        return(unlist(result, use.names=FALSE))
+    else
+        return(result)
 }
 
 #' @rdname tokenize
@@ -71,6 +84,86 @@ tokenize.corpus <- function(x, ...) {
     # unless more specific arguments are passed -- ADD THE ABILITY TO PASS THESE
     # need to include sep in this list too 
     tokenize(texts(x), ...)
+}
+
+tokenizeSingleOld <- function(s, sep=" ", ...) {
+    # function to tokenize a single element character
+    # profiling shows that using scan is 3x faster than using strsplit
+    # s <- unlist(s)
+    tokens <- scan(what="char", text=s, quiet=TRUE, quote="", sep=sep)
+    tokens <- clean(tokens, ...)
+    return(tokens)
+}
+
+tokenizeSingle <- function(x, sep=' ', 
+                       minLength=1, toLower=TRUE, removeDigits=TRUE, removePunct=TRUE,
+                       removeTwitter=TRUE, removeURL=TRUE, removeAdditional='') {
+    tokenizecpp(x, sep, minLength, toLower, removeDigits, removePunct, 
+                removeTwitter, removeURL, removeAdditional)
+}
+
+#' @title tokenizeOnly
+#' @name tokenizeOnly
+#'   
+#' @description For performance comparisons of tokenize-only functions. All 
+#'   functions use \code{\link{lapply}} to return a list of tokenized texts, 
+#'   when \code{x} is a vector of texts.
+#' @param x text(s) to be tokenized
+#' @param sep separator delineating tokens
+#' @param minLength minimum length in characters of tokens to be retained
+#' @return a list of character vectors, with each list element consisting of a 
+#'   tokenized text
+#' @examples
+#' # on inaugural speeches
+#' system.time(tmp1 <- tokenizeOnlyCppKW(inaugTexts))
+#' system.time(tmp2 <- tokenizeOnlyCppKB(inaugTexts))
+#' system.time(tmp3 <- tokenizeOnlyScan(inaugTexts))
+#' 
+#' \donttest{# on a longer set of texts
+#' load('~/Dropbox/QUANTESS/Manuscripts/Collocations/Corpora/lauderdaleClark/Opinion_files.RData')
+#' txts <- unlist(Opinion_files[1])
+#' names(txts) <- NULL
+#' system.time(tmp4 <- tokenizeOnlyCppKW(txts))
+#' ## about  9.2 seconds on Ken's MacBook Pro
+#' system.time(tmp5 <- tokenizeOnlyCppKB(txts))
+#' ## about  7.0 seconds
+#' system.time(tmp6 <- tokenizeOnlyScan(txts))
+#' ## about 12.6 seconds
+#' }
+NULL
+
+#' @rdname tokenizeOnly
+#' @details \code{tokenizeOnlyCppKW} calls KW's original C++ function, 
+#' with the cleaning options set to off.
+#' @export
+tokenizeOnlyCppKW <- function(x, sep=" ", minLength=1) {
+    lapply(x, tokenizeSingle, sep=sep, minLength=minLength, 
+           toLower=FALSE, 
+           removeDigits=FALSE, 
+           removePunct=FALSE, 
+           removeTwitter=FALSE, 
+           removeURL=FALSE)
+}
+
+#' @rdname tokenizeOnly
+#' @details \code{tokenizeOnlyCppKB} calls a C++ function that KB adapted from 
+#'   Kohei's code that does tokenization without the cleaning.
+#' @export
+tokenizeOnlyCppKB <- function(x, sep=" ", minLength=1) {
+    lapply(x, tokenizeOnlyCppCall, sep, minLength)
+}
+
+tokenizeOnlyCppCall <- function(x, sep=" ", minLength=1) {
+    justTokenizeCpp(x, sep, minLength)
+}
+
+
+#' @rdname tokenizeOnly
+#' @export
+#' @details \code{tokenizeOnlyScan} calls the R funtion \code{\link{scan}} for
+#'   tokenization.
+tokenizeOnlyScan <- function(x, sep=" ") {
+    lapply(x, function(s) scan(what="char", text=s, quiet=TRUE, quote="", sep=sep))
 }
 
 # @rdname segment

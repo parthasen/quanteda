@@ -1,5 +1,9 @@
 #include <Rcpp.h>
+<<<<<<< HEAD
 #include <string>
+=======
+#include <string.h>
+>>>>>>> dev
 #include <pcrecpp.h>
 
 using namespace Rcpp;
@@ -78,4 +82,8 @@ Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep,
     }
   }    
   return wrap(tokens);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> dev
