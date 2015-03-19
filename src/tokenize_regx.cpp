@@ -1,16 +1,28 @@
 #include <Rcpp.h>
 #include <string>
 #include <string.h>
-#include <pcrecpp.h>
+#include <regex>
 
 using namespace Rcpp;
 using namespace std;
-using namespace pcrecpp;
 
-pcrecpp::RE re_digits("[[:digit:]]");
-pcrecpp::RE re_punct("[[:punct:]]");
-pcrecpp::RE re_twitter("(^|\\s)(#|@)\\S+");
-pcrecpp::RE re_url("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:\\'\".,<>?]))");
+//using std::regex;
+//using std::regex_replace;
+//using std::string;
+
+//std::regex re_digits("[[:digit:]]", std::regex::extended);
+//std::regex re_punct("[[:punct:]]", std::regex::extended);
+//std::regex re_twitter("(^|\\s)(#|@)\\S+", std::regex::extended);
+//std::regex re_url("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:\\'\".,<>?]))", std::regex::extended);
+
+std::regex re_digits("", std::regex::extended);
+std::regex re_punct("", std::regex::extended);
+std::regex re_twitter("", std::regex::extended);
+std::regex re_url("", std::regex::extended);
+
+const std::string space0 = std::string("");
+const std::string space1 = std::string(" ");
+const std::string space2 = std::string("  ");
 
 // [[Rcpp::export]]
 Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep, 
@@ -35,15 +47,15 @@ Rcpp::CharacterVector tokenizecpp(SEXP x, SEXP sep,
   std::string rm_addit = Rcpp::as <string> (removeAdditional);
   
   // Regexp cleaning
-  if(rm_digts) re_digits.GlobalReplace("", &str);
-  if(rm_punct) re_punct.GlobalReplace("", &str);
-  if(rm_twitter) re_twitter.GlobalReplace(" ", &str);
-  if(rm_url) re_url.GlobalReplace("", &str);
+  if(rm_digts) str = std::regex_replace(str, re_digits, space0);
+  if(rm_punct) str = std::regex_replace(str, re_punct, space0);
+  if(rm_twitter) str = std::regex_replace(str, re_twitter, space1);
+  if(rm_url) str = std::regex_replace(str, re_url, space0);
   if(rm_addit.length() > 0){
     try{
-      pcrecpp::RE re_addit(rm_addit);
-      re_addit.GlobalReplace("", &str);
-    }catch(std::exception& e){
+      std::regex re_addit(rm_addit, std::regex::basic);
+      str = std::regex_replace(str, re_addit, space0);
+    }catch(std::regex_error& e){
       Rcout << "Invalid regular expression given: " <<  rm_addit << "\n";
     }
   }
