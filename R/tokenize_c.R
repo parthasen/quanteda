@@ -7,16 +7,19 @@ setwd("/home/kohei/Documents/R")
 #require(quantedaData)
 
 # Compile
+#install.packages('RcppExample')
 #install.packages('Rcpp')
 require(Rcpp)
-#Sys.setenv("PKG_LIBS"="-lpcrecpp") # This is importanat
-#Sys.setenv("PKG_CPPFLAGS"="-IC:/Rtools/gcc-4.6.3/bin")
-#Sys.setenv("PKG_LIBS"="-LC:/Rtools/gcc-4.6.3/i686-w64-mingw32/bin -lpcrecpp") # This is importanat
-#Rcpp::sourceCpp('src/tokenize.cpp')
 
-Sys.setenv("PKG_LIBS"="")
-Sys.setenv("PKG_CPPFLAGS"="-std=c++0x")
-Rcpp::sourceCpp('src/tokenize_regx.cpp')
+Sys.setenv("PKG_LIBS"="-lpcrecpp") # This is importanat
+#Sys.setenv("PKG_CPPFLAGS"="-IC:/Rtools/gcc-4.6.3/bin")
+#Sys.setenv("PKG_LIBS"="-Lscr -lpcrecpp") # This is importanat
+Sys.setenv("PKG_LIBS"="-L${R_HOME}/src -lpcrecpp") # This is importanat
+Rcpp::sourceCpp('src/tokenize.cpp')
+
+# Sys.setenv("PKG_LIBS"="")
+# Sys.setenv("PKG_CPPFLAGS"="-std=c++0x")
+# Rcpp::sourceCpp('src/tokenize_regx.cpp')
 
 #' @rdname tokenize_c
 #' @importFrom Rcpp evalCpp
