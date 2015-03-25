@@ -54,7 +54,6 @@ Collate:
     'clean.R'
     'collocations.R'
     'converters.R'
-    'corpus-sources-S4.R'
     'corpus.R'
     'dataDocs.R'
     'describe-texts.R'

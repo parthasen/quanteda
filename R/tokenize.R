@@ -102,69 +102,6 @@ tokenizeSingle <- function(x, sep=' ',
                 removeTwitter, removeURL, removeAdditional)
 }
 
-#' @title tokenizeOnly
-#' @name tokenizeOnly
-#'   
-#' @description For performance comparisons of tokenize-only functions. All 
-#'   functions use \code{\link{lapply}} to return a list of tokenized texts, 
-#'   when \code{x} is a vector of texts.
-#' @param x text(s) to be tokenized
-#' @param sep separator delineating tokens
-#' @param minLength minimum length in characters of tokens to be retained
-#' @return a list of character vectors, with each list element consisting of a 
-#'   tokenized text
-#' @examples
-#' # on inaugural speeches
-#' system.time(tmp1 <- tokenizeOnlyCppKW(inaugTexts))
-#' system.time(tmp2 <- tokenizeOnlyCppKB(inaugTexts))
-#' system.time(tmp3 <- tokenizeOnlyScan(inaugTexts))
-#' 
-#' \donttest{# on a longer set of texts
-#' load('~/Dropbox/QUANTESS/Manuscripts/Collocations/Corpora/lauderdaleClark/Opinion_files.RData')
-#' txts <- unlist(Opinion_files[1])
-#' names(txts) <- NULL
-#' system.time(tmp4 <- tokenizeOnlyCppKW(txts))
-#' ## about  9.2 seconds on Ken's MacBook Pro
-#' system.time(tmp5 <- tokenizeOnlyCppKB(txts))
-#' ## about  7.0 seconds
-#' system.time(tmp6 <- tokenizeOnlyScan(txts))
-#' ## about 12.6 seconds
-#' }
-NULL
-
-#' @rdname tokenizeOnly
-#' @details \code{tokenizeOnlyCppKW} calls KW's original C++ function, 
-#' with the cleaning options set to off.
-#' @export
-tokenizeOnlyCppKW <- function(x, sep=" ", minLength=1) {
-    lapply(x, tokenizeSingle, sep=sep, minLength=minLength, 
-           toLower=FALSE, 
-           removeDigits=FALSE, 
-           removePunct=FALSE, 
-           removeTwitter=FALSE, 
-           removeURL=FALSE)
-}
-
-#' @rdname tokenizeOnly
-#' @details \code{tokenizeOnlyCppKB} calls a C++ function that KB adapted from 
-#'   Kohei's code that does tokenization without the cleaning.
-#' @export
-tokenizeOnlyCppKB <- function(x, sep=" ", minLength=1) {
-    lapply(x, tokenizeOnlyCppCall, sep, minLength)
-}
-
-tokenizeOnlyCppCall <- function(x, sep=" ", minLength=1) {
-    justTokenizeCpp(x, sep, minLength)
-}
-
-
-#' @rdname tokenizeOnly
-#' @export
-#' @details \code{tokenizeOnlyScan} calls the R funtion \code{\link{scan}} for
-#'   tokenization.
-tokenizeOnlyScan <- function(x, sep=" ") {
-    lapply(x, function(s) scan(what="char", text=s, quiet=TRUE, quote="", sep=sep))
-}
 
 # @rdname segment
 # @return \code{segmentSentence} returns a character vector of sentences that

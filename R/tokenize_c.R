@@ -25,10 +25,17 @@
 # Boost
 # Rcpp::sourceCpp('~/quanteda/src/tokenize_boost.cpp')
 
+#' c tokenizing function
+#'
+#' @author Kohei Watanabe
 #' @rdname tokenize_c
+#'
+#' @param x string to be tokenized
+#' @param sep by default, tokenize expects a "white-space" delimiter between
+#' tokens. Alternatively, \code{sep} can be used to specify another character
+#' which delimits fields.
 #' @importFrom Rcpp evalCpp
 #' @useDynLib quanteda
-#' @param compatible with its R version
 #' @export
 tokenize_c <- function(x, sep=' ', simplify=FALSE,
                       minLength=1, toLower=TRUE, removeDigits=TRUE, removePunct=TRUE,
