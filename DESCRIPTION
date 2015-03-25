@@ -76,3 +76,4 @@ Collate:
     'textmodel-wordfish.R'
     'textmodel-wordscores.R'
     'tokenize.R'
+    'tokenize_c.R'

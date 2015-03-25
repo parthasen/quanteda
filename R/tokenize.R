@@ -4,7 +4,7 @@
 ###       for the build to work
 ###
 
-Sys.setenv("PKG_LIBS"="-lpcrecpp")
+#Sys.setenv("PKG_LIBS"="-lpcrecpp")
 
 #' tokenize a set of texts
 #'

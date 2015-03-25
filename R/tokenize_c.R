@@ -1,5 +1,4 @@
-rm(list = ls())
-setwd("/home/kohei/Documents/R")
+
 
 #devtools::install_github("kbenoit/quanteda", ref="dev")
 #devtools::install_github("kbenoit/quantedaData")
@@ -9,23 +8,28 @@ setwd("/home/kohei/Documents/R")
 # Compile
 #install.packages('RcppExample')
 #install.packages('Rcpp')
-require(Rcpp)
+#require(Rcpp)
 
 # PCRE
 #Sys.setenv("PKG_LIBS"="-Lscr -lpcrecpp") # This is importanat
-Sys.setenv("PKG_LIBS"="-L${R_HOME}/src -lpcrecpp") # This is importanat
-Rcpp::sourceCpp('src/tokenize.cpp')
+#Sys.setenv("PKG_LIBS"="-L${R_HOME}/src -lpcrecpp") # This is importanat
+#Rcpp::sourceCpp('~/quanteda/src/tokenize.cpp')
 
 # Regx
-Sys.setenv("PKG_LIBS"="-lpcrecpp") # This is importanat
+#Sys.setenv("PKG_LIBS"="-lpcrecpp") # This is importanat
 # Sys.setenv("PKG_LIBS"="")
 # Sys.setenv("PKG_CPPFLAGS"="-std=c++0x")
-# Rcpp::sourceCpp('src/tokenize_regx.cpp')
+# Rcpp::sourceCpp('~/quanteda/src/tokenize_regx.cpp')
+
+
+# Boost
+# Rcpp::sourceCpp('~/quanteda/src/tokenize_boost.cpp')
 
 #' @rdname tokenize_c
 #' @importFrom Rcpp evalCpp
 #' @useDynLib quanteda
 #' @param compatible with its R version
+#' @export
 tokenize_c <- function(x, sep=' ', simplify=FALSE,
                       minLength=1, toLower=TRUE, removeDigits=TRUE, removePunct=TRUE,
                       removeTwitter=TRUE, removeURL=TRUE, removeAdditional=''){
@@ -40,6 +44,10 @@ tokenize_c <- function(x, sep=' ', simplify=FALSE,
 }
 
 # Dev -----------------------------------------
+if(FALSE){
+
+rm(list = ls())
+setwd("/home/kohei/Documents/R")
 
 text1 <- 'This is 1 sentence with 2.0 numbers in it, and one comma.'
 text2 <- "We are his Beliebers, and him is #ourjustin @justinbieber we luv u"
@@ -100,4 +108,4 @@ microbenchmark(strsplit(text_bech, ' ', fixed=TRUE),
 #                times=1000)
 
 
-
+}
