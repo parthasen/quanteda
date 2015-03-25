@@ -1,1 +1,2 @@
-PKG_LIBS = -lboost_regex -lblas -llapack
+PKG_CPPFLAGS = -I$(BOOSTLIB)
+#PKG_LIBS = -lboost_regex -lblas -llapack
