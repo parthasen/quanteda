@@ -1,7 +1,1 @@
-PKG_LIBS = -LC:/Users/Watanab6/Documents/LSE/R/quanteda-devKW/inst/include -lpcrecpp -lblas -llapack
-
-#PKG_LIBS = -lpcrecpp -lblas -llapack
-#PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`
-
-
-
+PKG_LIBS = -lboost_regex -lblas -llapack
